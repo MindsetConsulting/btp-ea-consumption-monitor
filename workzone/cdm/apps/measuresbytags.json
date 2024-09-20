@@ -82,7 +82,7 @@
                 "urlTemplateParams": {
                     "appId": "measuresbytags",
                     "query": {
-                        "subaccountId": "<YOUR_SUBACCOUNT_GUID>",
+                        "subaccountId": "ddd7b168-2d0c-4094-b785-e8e8b36f4fc0",
                         "saasApprouter": "true"
                     }
                 }
