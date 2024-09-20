@@ -6,11 +6,6 @@
 
 Application to monitor and alert on commercial and technical consumption of BTP CPEA/BTPEA services.
 
-See also:
-
-1. March 2024: [SAP Blog: Prototype: Keep Track of those BTP Credits](https://community.sap.com/t5/technology-blogs-by-sap/prototype-keep-track-of-those-btp-credits/ba-p/13626545).
-2. June 2024: [SAP Blog: BTP FinOps: Keeping Track of your Credits](https://community.sap.com/t5/technology-blogs-by-sap/btp-finops-keeping-track-of-your-credits/ba-p/13737793).
-
 
 ![Screenshot of a the solution](./screenshot.png)
 
@@ -26,11 +21,6 @@ See also:
 - **Monitoring & Alerting**: Configures different alerts to be triggered when costs, usage and forecasts change on a daily basis.
 - **Cost Optimization**: Provides food for thought on how to control your spend and get the most out of your BTP investment.
 
-
-## Installation Video
-Watch our installation video on YouTube:
-
-[![YouTube video](https://img.youtube.com/vi/Q0X_XF1QuAg/0.jpg)](https://www.youtube.com/watch?v=Q0X_XF1QuAg)
 
 
 ## Requirements
@@ -301,17 +291,3 @@ For demo and test purposes it is possible to implement this solution using Free 
     - or, without updating HANA Cloud: use the `HANA Cloud Cockpit` to assign the missing Object Privileges to the user used to connect to the HDI. The missing privilege is the `_SYS_BI::BIMC_PROPERTIES` `table` which needs `SELECT` privileges.
 - **SAC "Can't read the view: BTPRC_MONITORING:..."**: It is possible that even after you remapped all 3 models to the correct connection, opening the ***story*** keeps on displaying this error while still showing the data at the same time. To get rid of this (un-needed) error, open your SAC story, click on `edit` and `save`. This should remove the error the next time you open the story.
 
-## How to obtain support
-[Create an issue](https://github.com/SAP-samples/btp-resource-consumption-monitor/issues) in this repository if you find a bug or have questions about the content.
- 
-For additional support, [ask a question in SAP Community](https://community.sap.com/t5/forums/postpage/choose-node/true/board-id/application-developmentforum-board).
-
-## Contributing
-If you wish to contribute code, offer fixes or improvements, please send a pull request. Due to legal reasons, contributors will be asked to accept a DCO when they create the first pull request to this project. This happens in an automated fashion during the submission process. SAP uses [the standard DCO text of the Linux Foundation](https://developercertificate.org/).
-
-## Code of Conduct
-
-See [Our Code of Conduct](CODE_OF_CONDUCT.md).
-
-## License
-Copyright (c) 2024 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the Apache Software License, version 2.0 except as noted otherwise in the [LICENSE](LICENSE) file.
