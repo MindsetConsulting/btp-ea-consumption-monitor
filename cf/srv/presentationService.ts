@@ -28,20 +28,13 @@ import {
     proxy_resetForecastSettings,
     proxy_calculateCommercialForecasts,
     proxy_resetTechnicalAllocations,
+    SetBulkTechnicalAllocations,
+    SetBulkForecastSettings,
     Card_HighestForecastServices,
     proxy_deleteStructureAndTagData
 } from '#cds-models/PresentationService'
 
-import {
-    calculateCommercialForecasts,
-    calculateCommercialForecastsForService,
-    deleteAllData,
-    downloadMeasuresForToday,
-    downloadMeasuresForPastMonths,
-    resetForecastSettings,
-    resetTechnicalAllocations,
-    deleteStructureAndTagData,
-} from '#cds-models/RetrievalService'
+import RetrievalService from '#cds-models/RetrievalService'
 
 import {
     TAggregationLevel,
@@ -69,7 +62,7 @@ export default class PresentationService extends cds.ApplicationService {
     async init() {
 
         // Connect to Retrieval Service to send triggers
-        const retrievalService = await cds.connect.to('RetrievalService')
+        const retrievalService = await cds.connect.to(RetrievalService)
 
         /**
          * Handlers for BTPServices
@@ -85,17 +78,20 @@ export default class PresentationService extends cds.ApplicationService {
                 const measure = (each as BTPService).cmByCustomer
                 if (measure) {
                     addBulletChartValues(measure)
-                    if (measure.forecastPct !== null) measure.forecastPctCriticality = getForecastCriticality(measure.forecastPct)
-                    //@ts-ignore
-                    if (measure.delta_measure_costPct !== null) measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_costPct)
-                    //@ts-ignore
-                    if (measure.delta_forecast_costPct !== null) measure.deltaForecastCriticality = getDeltaCriticality(measure.delta_forecast_costPct)
+                    measure.forecastPctCriticality = getForecastCriticality(measure.forecastPct)
+                    measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_costPct)
+                    measure.deltaForecastCriticality = getDeltaCriticality(measure.delta_forecast_costPct)
+                    // if (measure.forecastPct !== null) measure.forecastPctCriticality = getForecastCriticality(measure.forecastPct)
+                    // if (measure.delta_measure_costPct !== null) measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_costPct)
+                    // if (measure.delta_forecast_costPct !== null) measure.deltaForecastCriticality = getDeltaCriticality(measure.delta_forecast_costPct)
                 }
                 if (each.namesCommercialMetrics) {
                     each.namesCommercialMetrics = [...new Set(each.namesCommercialMetrics.split('__'))].join(' - ')
                 }
                 each.hideGlobalAccountDistribution = !Settings.appConfiguration.multiGlobalAccountMode
                 each.hideCommercialSpaceAllocation = !Settings.appConfiguration.distributeCostsToSpaces
+                each.hideServiceInstanceDistribution = !Settings.appConfiguration.serviceInstancesCreationList.includes(each.serviceId!)
+                each.hideServiceApplicationDistribution = !Settings.appConfiguration.serviceInstanceApplicationsCreationList.includes(each.serviceId!)
             })
         })
 
@@ -114,15 +110,18 @@ export default class PresentationService extends cds.ApplicationService {
                 const measure = (each as CommercialMetric).cmByCustomer
                 if (measure) {
                     addBulletChartValues(measure)
-                    if (measure.forecastPct !== null) measure.forecastPctCriticality = getForecastCriticality(measure.forecastPct)
-                    //@ts-ignore
-                    if (measure.delta_measure_costPct !== null) measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_costPct)
-                    //@ts-ignore
-                    if (measure.delta_forecast_costPct !== null) measure.deltaForecastCriticality = getDeltaCriticality(measure.delta_forecast_costPct)
+                    measure.forecastPctCriticality = getForecastCriticality(measure.forecastPct)
+                    measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_costPct)
+                    measure.deltaForecastCriticality = getDeltaCriticality(measure.delta_forecast_costPct)
+                    // if (measure.forecastPct !== null) measure.forecastPctCriticality = getForecastCriticality(measure.forecastPct)
+                    // if (measure.delta_measure_costPct !== null) measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_costPct)
+                    // if (measure.delta_forecast_costPct !== null) measure.deltaForecastCriticality = getDeltaCriticality(measure.delta_forecast_costPct)
                 }
                 each.tagStrings = each.tags ? formatTags(each.tags) : '(none)'
                 each.hideGlobalAccountDistribution = !Settings.appConfiguration.multiGlobalAccountMode
                 each.hideCommercialSpaceAllocation = !Settings.appConfiguration.distributeCostsToSpaces
+                each.hideServiceInstanceDistribution = !Settings.appConfiguration.serviceInstancesCreationList.includes(each.toService_serviceId!)
+                each.hideServiceApplicationDistribution = !Settings.appConfiguration.serviceInstanceApplicationsCreationList.includes(each.toService_serviceId!)
 
                 if ('technicalMetricForAllocation' in each && each.technicalMetricForAllocation == null) {
                     // Create virtual entry to show text so there is a button for the user
@@ -145,10 +144,12 @@ export default class PresentationService extends cds.ApplicationService {
                 each.tagStrings = each.tags ? formatTags(each.tags) : '(none)'
                 const measure = (each as TechnicalMetric).tmByCustomer
                 if (measure) {
-                    //@ts-ignore
-                    if (measure.delta_measure_usagePct !== null) measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_usagePct)
+                    measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_usagePct)
+                    // if (measure.delta_measure_usagePct !== null) measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_usagePct)
                 }
                 each.hideGlobalAccountDistribution = !Settings.appConfiguration.multiGlobalAccountMode
+                each.hideServiceInstanceDistribution = !Settings.appConfiguration.serviceInstancesCreationList.includes(each.toService_serviceId!)
+                each.hideServiceApplicationDistribution = !Settings.appConfiguration.serviceInstanceApplicationsCreationList.includes(each.toService_serviceId!)
             })
         })
 
@@ -159,9 +160,10 @@ export default class PresentationService extends cds.ApplicationService {
             items?.forEach(each => {
                 const measure = (each as BTPService).cmByCustomer
                 if (measure) {
-                    if (measure.forecastPct !== null) measure.forecastPctCriticality = getForecastCriticality(measure.forecastPct)
-                    //@ts-ignore
-                    if (measure.delta_measure_costPct !== null) measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_costPct)
+                    measure.forecastPctCriticality = getForecastCriticality(measure.forecastPct)
+                    measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_costPct)
+                    // if (measure.forecastPct !== null) measure.forecastPctCriticality = getForecastCriticality(measure.forecastPct)
+                    // if (measure.delta_measure_costPct !== null) measure.deltaActualsCriticality = getDeltaCriticality(measure.delta_measure_costPct)
                 }
                 if (each.namesCommercialMetrics) {
                     each.namesCommercialMetrics = [...new Set(each.namesCommercialMetrics.split('__'))].join(' - ')
@@ -170,18 +172,96 @@ export default class PresentationService extends cds.ApplicationService {
         })
 
         this.on(proxy_downloadMeasuresForToday, async (req) => {
-            //@ts-ignore
-            req.messages = await retrievalService.send(downloadMeasuresForToday.toString())
+            //@ts-expect-error
+            req.messages = await retrievalService.downloadMeasuresForToday()
         })
         this.on(proxy_downloadMeasuresForPastMonths, async (req) => {
-            //@ts-ignore
-            req.messages = await retrievalService.send(downloadMeasuresForPastMonths.toString(), { fromDate: Number(req.data.fromDate) })
+            //@ts-expect-error
+            req.messages = await retrievalService.downloadMeasuresForPastMonths({ fromDate: Number(req.data.fromDate) })
         })
-        this.on(proxy_deleteAllData, async (req) => req.info(await retrievalService.send(deleteAllData.toString())))
-        this.on(proxy_deleteStructureAndTagData, async (req) => req.info(await retrievalService.send(deleteStructureAndTagData.toString())))
-        this.on(proxy_resetForecastSettings, async (req) => req.notify(await retrievalService.send(resetForecastSettings.toString())))
-        this.on(proxy_resetTechnicalAllocations, async (req) => req.notify(await retrievalService.send(resetTechnicalAllocations.toString())))
-        this.on(proxy_calculateCommercialForecasts, async (req) => req.notify(await retrievalService.send(calculateCommercialForecasts.toString())))
+        this.on(proxy_deleteAllData, async (req) => req.info(await retrievalService.deleteAllData() as string))
+        this.on(proxy_deleteStructureAndTagData, async (req) => req.info(await retrievalService.deleteStructureAndTagData() as string))
+        this.on(proxy_resetForecastSettings, async (req) => req.notify(await retrievalService.resetForecastSettings() as string))
+        this.on(proxy_resetTechnicalAllocations, async (req) => req.notify(await retrievalService.resetTechnicalAllocations() as string))
+        this.on(proxy_calculateCommercialForecasts, async (req) => req.notify(await retrievalService.calculateCommercialForecasts() as string))
+
+        // Received from UI when Bulk Technical Allocations are set
+        this.on(SetBulkTechnicalAllocations, async (req) => {
+            const { allocations } = req.data
+
+            info(`Setting bulk technical allocations for ${allocations.length} metrics`)
+
+            let totalUpdated = 0
+            let totalDeleted = 0
+
+            for (const allocation of allocations) {
+                const { serviceId, cMeasureId, tMeasureId, metricName } = allocation
+
+                if (tMeasureId && tMeasureId.trim() !== '') {
+                    // Set or update allocation
+                    const allocationSetting: AllocationSetting = {
+                        serviceId: serviceId!,
+                        cMeasureId: cMeasureId!,
+                        mode: 'usage', // placeholder to deviate later
+                        tServiceId: serviceId, // placeholder to deviate later
+                        tMeasureId,
+                        metricName
+                    }
+                    const nbItems = await UPSERT.into(AllocationSettings).entries(allocationSetting)
+                    totalUpdated += nbItems
+                    info(`Set allocation for service [${serviceId}], metric [${cMeasureId}] to ${tMeasureId}`)
+                } else {
+                    // Remove allocation
+                    const nbItems = await DELETE.from(AllocationSettings, {
+                        serviceId,
+                        cMeasureId
+                    })
+                    totalDeleted += nbItems
+                    info(`Removed allocation for service [${serviceId}], metric [${cMeasureId}]`)
+                }
+            }
+
+            const status = `Bulk allocation update completed: ${totalUpdated} records updated, ${totalDeleted} records deleted.`
+            info(status)
+
+            req.notify(status)
+        })
+
+        // Received from UI when Bulk Forecast Settings are set
+        this.on(SetBulkForecastSettings, async (req) => {
+            const { settings } = req.data
+
+            info(`Setting bulk forecast settings for ${settings.length} metrics`)
+
+            let totalUpdated = 0
+
+            for (const setting of settings) {
+                const { serviceId, cMeasureId, method, degressionFactor } = setting
+
+                info(`Setting forecast config for service [${serviceId}], metric [${cMeasureId}] to ${method} with factor ${degressionFactor}`)
+
+                const forecastSetting: ForecastSetting = {
+                    serviceId: serviceId!,
+                    measureId: cMeasureId!,
+                    method: method as TForecastMethod,
+                    degressionFactor: degressionFactor || 1
+                }
+
+                const nbItems = await UPSERT.into(ForecastSettings).entries(forecastSetting)
+                totalUpdated += nbItems
+            }
+
+            const status = `Bulk forecast update completed: ${totalUpdated} records updated.`
+            info(status)
+
+            // Trigger a recalculation of the forecasts for all affected services
+            const uniqueServiceIds = [...new Set(settings.map(s => s.serviceId))]
+            for (const serviceId of uniqueServiceIds) {
+                await retrievalService.calculateCommercialForecastsForService({ serviceId })
+            }
+
+            req.notify(status)
+        })
 
         // Received from UI when Forecast Settings are changed
         this.on(CommercialMetric.actions.SetForecastSetting, async (req) => {
@@ -202,9 +282,7 @@ export default class PresentationService extends cds.ApplicationService {
             info(status)
 
             // Trigger a recalculation of the forecasts for this Service            
-            await retrievalService.send(calculateCommercialForecastsForService.toString(), { serviceId: serviceId })
-
-            return status
+            await retrievalService.calculateCommercialForecastsForService({ serviceId })
         })
 
         // Received from UI when Allocation Settings are changed
@@ -235,19 +313,17 @@ export default class PresentationService extends cds.ApplicationService {
 
             const status = `${nbItems} records updated in the database.`
             info(status)
-
-            return status
         })
 
         this.on(BTPService.actions.deleteBTPService, async req => {
             const item = req.params.slice(-1)[0] as BTPService
             await DELETE(BTPServices, item)
-            await retrievalService.send(calculateCommercialForecastsForService.toString(), { serviceId: item.serviceId })
+            await retrievalService.calculateCommercialForecastsForService({ serviceId: item.serviceId })
         })
         this.on(CommercialMetric.actions.deleteCommercialMetric, async req => {
             const item = req.params.slice(-1)[0] as CommercialMetric
             await DELETE(CommercialMetrics, item)
-            await retrievalService.send(calculateCommercialForecastsForService.toString(), { serviceId: item.toService_serviceId })
+            await retrievalService.calculateCommercialForecastsForService({ serviceId: item.toService_serviceId })
         })
         this.on(TechnicalMetric.actions.deleteTechnicalMetric, async req => {
             const item = req.params.slice(-1)[0] as TechnicalMetric
@@ -262,7 +338,7 @@ export default class PresentationService extends cds.ApplicationService {
                     level: TAggregationLevel.Customer
                 })
                 .orderBy('retrieved desc')
-            data.reportYearMonth = reportYearMonthToText(data.reportYearMonth!)
+            if (data) data.reportYearMonth = reportYearMonthToText(data.reportYearMonth!)
             return data
         })
 
@@ -282,7 +358,7 @@ export default class PresentationService extends cds.ApplicationService {
                 icon: 'sap-icon://money-bills',
                 info: '',
                 infoState: '',
-                number: info.forecast_cost,
+                number: info?.forecast_cost || 0,
                 numberDigits: 2,
                 numberFactor: '',
                 numberState: 'Neutral',
@@ -372,13 +448,9 @@ function addBulletChartValues(measure: CommercialMeasure): void {
     // Set default values
     let chart: TBulletChart = {
         min: 0,
-        //@ts-expect-error
         max: Number(measure.measure_cost),
-        //@ts-expect-error
         value: Number(measure.measure_cost),
-        //@ts-expect-error
         target: Number(measure.measure_cost),
-        // @ts-expect-error
         forecast: Number(measure.forecast_cost),
         criticality: statusMap.Neutral
     }
@@ -392,7 +464,6 @@ function addBulletChartValues(measure: CommercialMeasure): void {
         chart.target = Number(measure.max_cost)
 
         //Calculate Criticality based on Measure or Forecast, for Cost, Usage, ChargedBlocks or ActualUsage
-        //@ts-expect-error
         const evaluatedProperty = Number(measure.forecast_cost)
         if (evaluatedProperty <= warningLevel) chart.criticality = statusMap.Good
         else if (evaluatedProperty <= errorLevel) chart.criticality = statusMap.Warning
@@ -407,7 +478,7 @@ function addBulletChartValues(measure: CommercialMeasure): void {
  * Calculate the criticality value for the a delta measure
  * @param value value that will be compared to thresholds
  */
-function getForecastCriticality(value?: number): number {
+function getForecastCriticality(value?: number | null): number {
     let criticality = statusMap.Neutral
     if (value) {
         if (value <= multipliers.Normal) criticality = statusMap.Good
@@ -421,7 +492,7 @@ function getForecastCriticality(value?: number): number {
  * Calculate the criticality value for the a delta measure
  * @param value value that will be compared to thresholds
  */
-function getDeltaCriticality(value?: number): number {
+function getDeltaCriticality(value?: number | null): number {
     let criticality = statusMap.Neutral
     if (value) {
         if (value <= deltaThresholds.Normal) criticality = statusMap.Good

@@ -5,12 +5,64 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 
-## Version 2.0.x - Future
+## Version 2.4.0 - Future
+### Added
+
+### Fixed
+
 ### Changed
-- Work Zone release 2024-07-11 will make changes the default sorting of spaces, which is now pre-empted in the application to keep the correct sort order
+- Support for CDS 9.7
+
+## Version 2.3.1 - 2026-02-05
+
+Hot fix related to Work Zone package only: updated application definitions in CDM to match updated Work Zone requirements
+
+## Version 2.3.0 - 2025-12-11
+### Added
+
+### Fixed
+- Improved migration script for upgrades from v2.1
+
+### Changed
+- Support for CDS 9.3
+- Kyma health checks
+
+## Version 2.2.0 - 2025-09-12
+### Added
+- New 'Application' level in account structure (subaccount > service > instance > application)
+- New detailed usage information for `ai-core` service per used AI model
+- Tags are now inherited so child items of a tagged entity will display their costs as well (non-inherited view still available as well)
+- 2 new calculation views with the inherited tags view, but without the 'datacenter', 'space' and 'service (alloc.)' levels
+- 2 new SAC views to toggle between views that either include tag inheritance or not
+- Added 'bulk edit' feature for Technical Allocation and Forecast Configuration from the Billing Verification table
+
+### Fixed
+- Fixed empty dropdown in copy/paste of tags
+- Renewed SAC package validity
+
+### Changed
+- Improved performance of forecast calculations during data refresh
+- Changed generated IDs for Service Instances to ensure uniqueness, with migration script
+- Workzone cards now show KPIs of last available day instead of 'today'
+- Support for CDS 9.2
+- Moved ctz dependency to pre-requisite for Kyma deployments
+- Added npm-ci before build step for automated deployment pipelines
+
+## Version 2.1.0 - 2024-11-15
+### Added
+- Support for Kyma deployment
+- Support for CDS 8.4
+- Enabled lower level 'instances' breakdown for select services
+
+### Changed
+- Removed dependency on Application Logging service to minimize footprint
+- Increased UI timeout from 60s to 120s which could be required for multi-GlobalAccount setups
+- Work Zone spaces are now explicitely sorted, leveraging a new Work Zone configuration feature
 - Improved handling of account structure to allow for changes in sub account naming and hierarchies
 - Extended the sync job of the previous month from 1st of the month till 5th of the month to ensure receiving its non-estimated/final data. This will create a new job. The old job can be removed manually via the BTP Cockpit.
 
+### Fixed
+- Fixed faulty filter dropdown in configuring Alerts
 
 ## Version 2.0.2 - 2024-07-03
 ### Added

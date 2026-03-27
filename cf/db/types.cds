@@ -6,14 +6,16 @@ namespace types;
 
 type TAggregationLevel       : String enum {
     Customer;
-    GlobalAccount       = 'Global Account';
-    SubAccount          = 'Sub Account';
+    GlobalAccount            = 'Global Account';
+    SubAccount               = 'Sub Account';
     Directory;
     Datacenter;
     Space;
-    CustomTag           = 'Custom Tag'; //Not used so far
-    ServiceInSubaccount = 'Service';
-    ServiceInSpace      = 'Service (alloc.)';
+    CustomTag                = 'Custom Tag'; //Not used so far
+    ServiceInSubaccount      = 'Service';
+    ServiceInSpace           = 'Service (alloc.)';
+    InstanceOfService        = 'Instance'; // e.g. HANA Cloud database instance, or a Cloud Foundry Application
+    ApplicationInService     = 'Application'; // e.g. AI Core model
 }
 
 type TInterval               : String enum {
@@ -44,14 +46,16 @@ type TServiceScopes          : String enum {
 
 type TAccountStructureLevels : String enum {
     Customer;
-    GlobalAccount       = 'Global Account';
+    GlobalAccount            = 'Global Account';
     Directory;
     Datacenter;
-    SubAccount          = 'Sub Account';
+    SubAccount               = 'Sub Account';
     Space;
-    Instance            = 'Environment';
-    ServiceInSubaccount = 'Service';
-    ServiceInSpace      = 'Service (alloc.)';
+    Instance                 = 'Environment'; // e.g. Cloud Foundry Org
+    ServiceInSubaccount      = 'Service'; // e.g. HANA Cloud service created in 'Other' environment
+    ServiceInSpace           = 'Service (alloc.)'; // e.g. HANA Cloud services created in a CF Space
+    InstanceOfService        = 'Instance'; // e.g. HANA Cloud database instance, or a Cloud Foundry Application
+    ApplicationInService     = 'Application'; // e.g. AI Core model
 }
 
 type TPasteMode              : String enum {
@@ -116,6 +120,28 @@ type TSetForecastSettingParams {
 type TSetTechnicalMetricForAllocationParams {
     tMeasureId : String;
     metricName : String;
+}
+
+type TBulkTechnicalAllocationItem {
+    serviceId  : String;
+    cMeasureId : String;
+    tMeasureId : String;
+    metricName : String;
+}
+
+type TBulkTechnicalAllocationParams {
+    allocations : many TBulkTechnicalAllocationItem;
+}
+
+type TBulkForecastSettingItem {
+    serviceId        : String;
+    cMeasureId       : String;
+    method           : String;
+    degressionFactor : Double;
+}
+
+type TBulkForecastSettingParams {
+    settings : many TBulkForecastSettingItem;
 }
 
 type TPasteTagsParams {

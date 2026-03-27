@@ -31,8 +31,9 @@ export const Settings = {
         //     }
         // },
         /**
-         * As spaces do not have a cost aspect, this setting specifies whether the tool should try and distribute costs to the space (and underlying service) level.
-         * This setting impacts both UI and logic
+         * Costs are only available till Subaccount level (Global account, directory and sub account), and not lower (spaces, service instances and service instance applications)
+         * This setting specifies whether the tool should *try* and distribute costs to the lower levels (sub items).
+         * This setting impacts both UI and logic.
          */
         distributeCostsToSpaces: true,
         /**
@@ -48,7 +49,42 @@ export const Settings = {
          */
         billingVerification: {
             allowedDifferenceThreshold: 10
-        }
+        },
+        /**
+         * List of services for which a lower level should be created with instanceIds or Applications. To disable, provide empty list.
+         * Technical metrics will be populated by default, commercial metrics will only be populated if Technical Allocation has been configured for the service.
+         * 
+         * Not all BTP Services have the concept of 'instances', e.g. SAP Integration Suite or SAP Work Zone are not 'instances' because they are 'subscriptions' where there is only 1 per sub account.
+         * Note: 'Application' is a child of 'Instance', so if a service is listed in the 'serviceInstanceApplicationsCreationList' it HAS to be listed in 'serviceInstancesCreationList' as well
+         */
+        serviceInstancesCreationList: [
+            'abap',
+            'ai-core',
+            'build-code',
+            'adobeforms',
+            'data-analytics', // SAP Datasphere
+            'data-attribute-recommendation',
+            'data-intelligence',
+            'document-information-extraction',
+            'documentservice',
+            'enterprisemessaging',
+            'hana-base', // SAP HANA on SAP DC
+            'hana-cloud', // SAP HANA Cloud
+            'integration-suite-advanced-event-mesh',
+            'iot',
+            'jobscheduler',
+            'linux-container', // Cloud Foundry Runtime
+            'mobileservices',
+            'objectstore',
+            'postgresql-db',
+            'sap-analytics-cloud-embedded-edition',
+            'sap-build-apps',
+            'translationhub',
+            'xfs-kyma'
+        ],
+        serviceInstanceApplicationsCreationList: [
+            'ai-core'
+        ]
     },
     defaultValues: {
         /**

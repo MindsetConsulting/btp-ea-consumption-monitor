@@ -2,19 +2,20 @@ using PresentationService as service from '../../srv/presentationService';
 
 annotate service.CommercialMeasures with @(
     Aggregation.ApplySupported                     : {
-        Transformations       : [
-            'aggregate',
-            'topcount',
-            'bottomcount',
-            'identity',
-            'concat',
-            'groupby',
-            'filter',
-            'top',
-            'skip',
-            'orderby',
-            'search'
-        ],
+        // The default FE table type changed in UI5 v1.142 making it default to AnalyticalTable instead of ResponsiveTable when below transformations are defined.
+        // Transformations       : [
+        //     'aggregate',
+        //     'topcount',
+        //     'bottomcount',
+        //     'identity',
+        //     'concat',
+        //     'groupby',
+        //     'filter',
+        //     'top',
+        //     'skip',
+        //     'orderby',
+        //     'search'
+        // ],
         Rollup                : #SingleHierarchy,
         GroupableProperties   : [
             metricName,
@@ -31,17 +32,20 @@ annotate service.CommercialMeasures with @(
     Analytics.AggregatedProperty #SUM_measure_cost : {
         Name                : 'SUM_measure_cost',
         AggregationMethod   : 'sum',
-        AggregatableProperty: measure_cost
+        AggregatableProperty: measure_cost,
+        ![@Common.Label]    : 'Cost'
     },
     Analytics.AggregatedProperty #SUM_forecast_cost: {
         Name                : 'SUM_forecast_cost',
         AggregationMethod   : 'sum',
-        AggregatableProperty: forecast_cost
+        AggregatableProperty: forecast_cost,
+        ![@Common.Label]    : 'Forecast'
     },
     Analytics.AggregatedProperty #SUM_measure_usage: {
         Name                : 'SUM_measure_usage',
         AggregationMethod   : 'sum',
-        AggregatableProperty: measure_usage
+        AggregatableProperty: measure_usage,
+        ![@Common.Label]    : 'Usage'
     },
     UI                                             : {
         Chart #MetricBulletChart                         : {
@@ -220,19 +224,20 @@ annotate service.CommercialMeasures with @(
 
 annotate service.TechnicalMeasures with @(
     Aggregation.ApplySupported                     : {
-        Transformations       : [
-            'aggregate',
-            'topcount',
-            'bottomcount',
-            'identity',
-            'concat',
-            'groupby',
-            'filter',
-            'top',
-            'skip',
-            'orderby',
-            'search'
-        ],
+        // The default FE table type changed in UI5 v1.142 making it default to AnalyticalTable instead of ResponsiveTable when below transformations are defined.
+        // Transformations       : [
+        //     'aggregate',
+        //     'topcount',
+        //     'bottomcount',
+        //     'identity',
+        //     'concat',
+        //     'groupby',
+        //     'filter',
+        //     'top',
+        //     'skip',
+        //     'orderby',
+        //     'search'
+        // ],
         Rollup                : #SingleHierarchy,
         GroupableProperties   : [
             metricName,
@@ -244,7 +249,8 @@ annotate service.TechnicalMeasures with @(
     Analytics.AggregatedProperty #SUM_measure_usage: {
         Name                : 'SUM_measure_usage',
         AggregationMethod   : 'sum',
-        AggregatableProperty: measure_usage
+        AggregatableProperty: measure_usage,
+        ![@Common.Label]    : 'Usage'
     },
     UI                                             : {
         Chart #ComparisonBySubAccount   : {
