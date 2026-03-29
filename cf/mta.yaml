@@ -35,7 +35,7 @@ modules:
       - name: btprc-dest
       - name: btprc-db
       - name: btprc-uas
-      - name: btprc-notif
+      - name: alert-notification-service
       - name: btprc-scheduler
       # - name: btprc-uas-ups
 
@@ -258,11 +258,11 @@ resources:
       service-keys:
         - name: btprc-scheduler-key
 
-  - name: btprc-notif
+  - name: alert-notification-service
     type: org.cloudfoundry.managed-service
     parameters:
       service: alert-notification
-      service-plan: standard
+      service-plan: build-runtime
       service-keys:
         - name: btprc-notif-key
 
