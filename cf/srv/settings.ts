@@ -4,7 +4,7 @@ export const Settings = {
          * Specifies if the tool is used for multiple global accounts.
          * This setting impacts UI only as it steers some of the tables and facets that are only shown for a multi-GA setup
          */
-        multiGlobalAccountMode: false,
+        multiGlobalAccountMode: true,
         /**
          * For multi-GA setups where currencies are different, the currency needs to be converted in order to create a single cost metric on Customer level.
          * If a cost metric is not in the Target currency, it will be converted according to the mentioned rate.
@@ -12,7 +12,7 @@ export const Settings = {
          * This conversion is done at the time of storing the data in the database, so changing the rate will only impact future costs, not historic costs
         */
         currencyConversions: {
-            active: false,
+            active: true,
             target: 'EUR',
             rates: {
                 'JPY': 0.0059,    // when 1 JPY = 0.0059 EUR
@@ -20,7 +20,7 @@ export const Settings = {
                 'CAD': 0.6781,    // when 1 CAD = 0.6781 EUR
                 'AUD': 0.6150,    // when 1 AUD = 0.6150 EUR
                 'CHF': 1.0319,    // when 1 CHF = 1.0319 EUR
-                'USD': 0.9205     // when 1 USD = 0.9205 EUR
+                'USD': 0.8546     // when 1 USD = 0.8546 EUR
             }
         },
         // currencyConversions: {

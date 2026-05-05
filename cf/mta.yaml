@@ -37,7 +37,7 @@ modules:
       - name: btprc-uas
       - name: alert-notification-service
       - name: btprc-scheduler
-      # - name: btprc-uas-ups
+      - name: btprc-uas-ups-prod
 
   - name: BTPResourceConsumption-db-deployer
     type: hdb
@@ -273,8 +273,8 @@ resources:
       service-plan: reporting-ga-admin
       service-keys:
         - name: btprc-uas-key
-  # - name: btprc-uas-ups
-  #   type: org.cloudfoundry.existing-service
+  - name: btprc-uas-ups-prod
+    type: org.cloudfoundry.existing-service
 
   - name: btprc-auth
     type: org.cloudfoundry.managed-service
