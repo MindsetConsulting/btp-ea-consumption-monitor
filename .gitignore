@@ -53,3 +53,9 @@ temp
 *.bkp
 
 mcp-lib-fix/
+
+# Claude Code
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.mcp.json
