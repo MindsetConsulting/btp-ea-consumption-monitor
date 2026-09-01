@@ -196,7 +196,7 @@ In order for the SAC dashboards to connect to your data, it needs a connection t
 
 #### Step 2. Upload content
 1. In your SAC tenant, navigate to `Transport`, `Import`.
-2. Click on the upload button to upload the [SAC package file](./sac).
+2. Click on the upload button to upload the latest [SAC package file](./sac). (Note: you can ignore the warning '*Importing may not work for BTPRC FinOps Dashboard as it was created in an older version of SAP Analytics Cloud.*')
 3. After uploading, refresh the list and open the uploaded package.
 4. Validate the proposed settings and finally click `Import`.
 
