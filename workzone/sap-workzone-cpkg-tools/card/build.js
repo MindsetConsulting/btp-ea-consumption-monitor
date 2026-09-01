@@ -1,7 +1,7 @@
-module.exports.build = function (dir) {
+module.exports.build = async function (dir) {
   const path = require("path"),
     util = require("../util/util.js"),
-    rimraf = require("rimraf"),
+    { rimrafSync } = require("rimraf"),
     fs = require("fs-extra"),
     root = path.join(dir, util.relativeDir(dir)),
     packagejson = util.json.fromFile(path.join(root, "package.json")),
@@ -13,7 +13,7 @@ module.exports.build = function (dir) {
   util.log.fancy("Building Card Package: " + dir + "/src");
   console.log(" - Clean files and folders");
 
-  rimraf.sync(dist);
+  rimrafSync(dist);
 
   fs.removeSync(out);
 
@@ -24,7 +24,7 @@ module.exports.build = function (dir) {
     console.log(ui5path);
     if (!fs.existsSync(ui5path)) {
       console.log("install @ui5/cli");
-      util.spawn.sync("npm install @ui5/cli@3.3.1", path.join(__dirname, "..", "..", ".."), "fail to install ui5");
+      util.spawn.sync("npm install @ui5/cli@4.0.62", path.join(__dirname, "..", "..", ".."), "fail to install ui5");
     }
     if (fs.existsSync(ui5path)) {
       process.env.PATH += ":" + path.dirname(ui5path);
@@ -45,7 +45,7 @@ module.exports.build = function (dir) {
 
   console.log(" - Zip content to " + name + ".zip");
 
-  util.zip.folder(out, root, "dist");
+  await util.zip.folder(out, root, "dist");
 
   util.log.fancy("Building Card Package finished successful");
 }

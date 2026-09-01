@@ -5,19 +5,19 @@ module.exports.pull = function (dir, local) {//load content.json
     contentConfig will be /Top/content.json
     contentDir will be /Top/__contents
   */
-  const rimraf = require("rimraf"),
+  const { rimrafSync } = require("rimraf"),
     path = require("path"),
     util = require("../util/util.js"),
     fs = require("fs-extra"),
     contentConfig = util.json.fromFile(path.join(dir, util.relativeDir(dir), "content.json")),
-    cdmTypes = ["workpage", "space", "role", "businessapp", "urltemplate", "catalog"],
+    cdmTypes = [ "workpage", "space", "role", "businessapp", "urltemplate", "catalog"],
     contentsDir = path.join(dir, util.relativeDir(dir), "__contents");
-
+  
   util.log.fancy("Starting Pull");
 
   try {
     console.log("Clean __contents dir");
-    rimraf.sync(contentsDir);
+    rimrafSync(contentsDir);
 
     fs.mkdirSync(contentsDir);
 
@@ -84,7 +84,7 @@ module.exports.pull = function (dir, local) {//load content.json
 
       console.log("From Folder: " + fromDir);
       // If the artifact already have the package.json which means it has build script
-      if (config.src.build || fs.existsSync(path.join(fromDir, "package.json"))) {
+      if (config.src.build || fs.existsSync(path.join(fromDir,"package.json"))){
         console.log("Copy From Folder to: " + path.join(baseDir, "build"));
         fs.copySync(fromDir, path.join(baseDir, "build"));
       } else {
@@ -92,7 +92,7 @@ module.exports.pull = function (dir, local) {//load content.json
         // Copy the from folder /home/user/cpproject/mycard to Target Folder "/Top/__contents/card-sample/build/src"
         console.log("Copy From Folder to: " + path.join(baseDir, "build", "src"));
         fs.copySync(fromDir, path.join(baseDir, "build", "src"));
-
+        
         if (config.type.toLowerCase() === "card") {
           // Find out /Top/__contents/card-sample/build/src/manifest.json
           const artifactManifestjson = util.json.fromFile(path.join(baseDir, "build", 'src', 'manifest.json'));
@@ -105,15 +105,15 @@ module.exports.pull = function (dir, local) {//load content.json
           console.log("Write file: " + path.join(baseDir, "build", "ui5.yaml"));
           tmpText = fs.readFileSync(path.join(__dirname, "../resources/card-ui5.yaml.template"), 'utf-8').replace("{{CardName}}", cardName);
           fs.writeFileSync(path.join(baseDir, "build", "ui5.yaml"), tmpText);
-
-          rimraf.sync(path.join(baseDir, "build", "src", ".card"));
-          rimraf.sync(path.join(baseDir, "build", "src", ".wst"));
-          rimraf.sync(path.join(baseDir, "build", "src", "ui5.yaml"));
-          rimraf.sync(path.join(baseDir, "build", "src", "package.json"));
-
+  
+          rimrafSync(path.join(baseDir, "build", "src", ".card"));
+          rimrafSync(path.join(baseDir, "build", "src", ".wst"));
+          rimrafSync(path.join(baseDir, "build", "src", "ui5.yaml"));
+          rimrafSync(path.join(baseDir, "build", "src", "package.json"));
+        
         } else {
           // Find out /Top/__contents/card-sample/build/src/manifest.json
-          const artifactManifestjson = util.json.fromFile(path.join(baseDir, "build", 'src', 'manifest.json'));
+          const artifactManifestjson = util.json.fromFile(path.join(baseDir, "build", 'src','manifest.json'));
           const artifactName = artifactManifestjson["sap.artifact"].id.replace(/\./g, "-");
           // Add package.json
           console.log("Write file: " + path.join(baseDir, "build", "package.json"));

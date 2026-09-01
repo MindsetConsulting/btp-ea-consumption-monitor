@@ -1,10 +1,10 @@
-module.exports.build = function (dir) {
-  const rimraf = require("rimraf"),
+module.exports.build = async function (dir) {
+  const { rimrafSync } = require("rimraf"),
     util = require("../util/util.js"),
     path = require("path"),
     fs = require("fs-extra"),
     handlebars = require("handlebars"),
-    propertiesReader = require("properties-reader"),
+    { propertiesReader } = require("properties-reader"),
     businessHubBuild = process.argv.slice(2)[0] === "-b";
 
   var validTypes = ["card", "workflow", "workspace-template", "workspace", "homepage", "workpage", "space", "role", "businessapp", "urltemplate", "catalog"];
@@ -22,7 +22,7 @@ module.exports.build = function (dir) {
   function createCDMBusinessAppForCard(cardManifest, i18nPath, predefinedVizId) {
     var cardId = cardManifest["sap.app"].id;
     var appId = `${cardId}.app`;
-    var vizId = predefinedVizId || `${cardId}.viz`;
+    var vizId = predefinedVizId ||`${cardId}.viz`;
     var allKeys = util.i18n.allKeys(cardManifest);
     var result = {
       _version: "3.2.0",
@@ -68,7 +68,7 @@ module.exports.build = function (dir) {
           .split(/\r?\n/)
           .map(line => line.split("="))
           .filter(entry => i18nKeys.includes(entry[0]))
-          .forEach(entry => entries[entry[0]] = entry[1]);
+          .forEach(entry => entries[entry[0]] = util.i18n.parseValue(entry[1]));
         return {
           locale: file.slice("i18n_".length, file.length - ".properties".length).replace(/_/gi, "-"),
           textDictionary: entries
@@ -103,9 +103,9 @@ module.exports.build = function (dir) {
         console.log("No translation file found: " + sourceDir + manifest["sap.app"].i18n);
         return false;
       }
-      var translations = propertiesReader(i18n),
+      var translations = propertiesReader({ sourceFile: i18n }),
         template = handlebars.compile(JSON.stringify(manifest)),
-        data = translations.getAllProperties(),
+        data = Object.fromEntries(translations.entries()),
         resultJSON = JSON.parse(template(data));
       for (var n in mapping) {
         packageJSON[mapping[n]] = getJSONPathValue(n, resultJSON);
@@ -212,7 +212,7 @@ module.exports.build = function (dir) {
             description: "Description"
           }
         });
-        var cardTranslation = (function () {
+        var cardTranslation = (function(){
           var sourceDir = path.dirname(app.cardConfig.manifestFilePath),
             i18nDir = path.join(sourceDir, "i18n");
           var cardConfig = createCDMBusinessAppForCard(app.cardConfig.manifest, i18nDir);
@@ -239,17 +239,17 @@ module.exports.build = function (dir) {
           baseDir = path.join(contentsDir, name),
           targetDir = path.join(mainArtifactsPath, name),
           targetBusinessHubTargetDir = path.join(businessHubArtifactsPath, name);
-
+        
         if (config.src.build) {
           // User specified build
-          aRun = config.src.build.split(" && ")
+          aRun =  config.src.build.split(" && ")
           for (var i = 0; i < aRun.length; i++) {
             console.log("Run build in: " + path.join(baseDir, "build"));
             util.spawn.sync(aRun[i], path.join(baseDir, "build"), aRun[i] + " cannot be executed.\n");
           }
         } else {
           // Use Default Build
-          var command = "node  " + path.join(__dirname, "artifactBuild.js") + " " + path.join(baseDir, "build") + " " + config.type.toLowerCase();
+          var command = "node  " + path.join(__dirname, "artifactBuild.js") + " " + path.join(baseDir, "build") + " " +  config.type.toLowerCase();
           console.log("Run build in: " + command);
           util.spawn.sync(command, path.join(baseDir, "build"), command + "node  cannot be executed.\n");
         }
@@ -263,7 +263,7 @@ module.exports.build = function (dir) {
         } else {
           const artifactPackagejson = util.json.fromFile(path.join(baseDir, "build", "package.json"));
           packageFileName = artifactPackagejson.name + ".zip"
-        }
+        }  
         //packageSrcPath = /Top/__contents/card-sample/build/xxx.zip
         //packageTargetPath = /Top/package/artifacts/card-sample/xxx.zip
         var packageSrcPath = path.join(baseDir, "build", packageFileName),
@@ -289,7 +289,7 @@ module.exports.build = function (dir) {
         if (!config.src.manifest || !fs.pathExistsSync(manifestPath)) {
           manifestPath = path.join(baseDir, "build", "src", "manifest.json")
         }
-
+      
         var sourceDir = path.dirname(manifestPath),
           manifest = util.json.fromFile(manifestPath),
           i18nDir = path.join(sourceDir, "i18n"),
@@ -311,7 +311,7 @@ module.exports.build = function (dir) {
             _generator: "cpkg-project-template"
           };
           console.log("Card found: Deriving sap.artifact section");
-
+          
           //copy the sap.app section
           artifactManifest["sap.artifact"] = JSON.parse(JSON.stringify(manifest["sap.app"]));
 
@@ -322,7 +322,7 @@ module.exports.build = function (dir) {
             else if (typeof manifest["sap.app"].i18n === "object") {
               i18nFolder = path.join(sourceDir, path.dirname(manifest["sap.app"].i18n.bundleUrl));
             }
-
+  
             //i18n is copied always in the i18n folder
             artifactManifest["sap.artifact"].i18n = "i18n/i18n.properties";
           }
@@ -344,7 +344,7 @@ module.exports.build = function (dir) {
             artifactManifest["sap.artifact"].i18n = "i18n/i18n.properties";
             // i18nFolder = /Top/__contents/card-sample/build/src/i18nfolder
             i18nFolder = path.join(sourceDir, path.dirname(manifest["sap.artifact"].i18n))
-          }
+          }  
         }
 
         console.log("Writing artifact manifest: " + targetDir + "/manifest.json");
@@ -391,10 +391,10 @@ module.exports.build = function (dir) {
 
 
   console.log("Clear previous results...")
-  rimraf.sync(mainPackagePath);
-  rimraf.sync(businessHubPath);
-  rimraf.sync(path.join(root, "package.zip"));
-  rimraf.sync(path.join(root, "businesshub.zip"));
+  rimrafSync(mainPackagePath);
+  rimrafSync(businessHubPath);
+  rimrafSync(path.join(root, "package.zip"));
+  rimrafSync(path.join(root, "businesshub.zip"));
   console.log("Done");
 
   console.log("Create folders...")
@@ -502,13 +502,13 @@ module.exports.build = function (dir) {
   util.json.toFile(path.join(mainPackagePath, "manifest.json"), man);
 
   console.log("Creating package.zip ");
-  util.zip.folder(path.join(root, "package.zip"), path.join(root, "package"));
+  await util.zip.folder(path.join(root, "package.zip"), path.join(root, "package"));
 
   if (businessHubBuild) {
     createPackageJSON(root, businessHubPath);
     util.log.fancy("Creating businesshub.zip");
-    util.zip.folder(path.join(root, "businesshub.zip"), path.join(root, "businesshub"));
-    rimraf.sync(path.join(root, "businesshub"));
+    await util.zip.folder(path.join(root, "businesshub.zip"), path.join(root, "businesshub"));
+    rimrafSync(path.join(root, "businesshub"));
   }
   util.log.fancy("Build finished successful.");
 
